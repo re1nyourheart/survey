@@ -1,0 +1,124 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Random Conditions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            padding: 50px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .question {
+            margin: 20px 0;
+        }
+        .options {
+            margin: 10px 0;
+        }
+        .options input {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Survey Random Conditions</h1>
+    <div class="question">
+        <label>Product Price:</label>
+        <span id="price">150</span> USD
+    </div>
+    <div class="question">
+        <label>Product Color:</label>
+        <span id="color">Green</span>
+    </div>
+    <div class="question">
+        <label>Promotion:</label>
+        <span id="promotion">Full reduction</span>
+    </div>
+
+    <div class="question">
+        <label>Purchase Intention:</label>
+        <div class="options">
+            <input type="radio" name="intention" value="Willing to Buy" id="willing">
+            <label for="willing">Willing to Buy</label><br>
+            <input type="radio" name="intention" value="Neutral" id="neutral">
+            <label for="neutral">Neutral</label><br>
+            <input type="radio" name="intention" value="Unwilling to Buy" id="unwilling">
+            <label for="unwilling">Unwilling to Buy</label>
+        </div>
+    </div>
+
+    <button onclick="generateRandomCondition()">Generate New Condition</button>
+    <button onclick="recordChoice()">Submit & Record Choice</button>
+
+    <div id="result"></div>
+
+    <script>
+        // 定义条件的数组
+        var prices = [50, 100, 150];
+        var colors = ['Red', 'Blue', 'Green'];
+        var promotions = ['Discount', 'Full reduction', 'Free gift'];
+
+        // 随机生成条件的函数
+        function generateRandomCondition() {
+            var randomPrice = prices[Math.floor(Math.random() * prices.length)];
+            var randomColor = colors[Math.floor(Math.random() * colors.length)];
+            var randomPromotion = promotions[Math.floor(Math.random() * promotions.length)];
+
+            // 更新页面中的内容
+            document.getElementById('price').innerText = randomPrice;
+            document.getElementById('color').innerText = randomColor;
+            document.getElementById('promotion').innerText = randomPromotion;
+
+            // 重置购买意愿的选择
+            document.querySelectorAll('input[name="intention"]').forEach(input => input.checked = false);
+        }
+
+        // 记录用户选择的函数
+        function recordChoice() {
+            // 获取当前页面展示的条件
+            var currentPrice = document.getElementById('price').innerText;
+            var currentColor = document.getElementById('color').innerText;
+            var currentPromotion = document.getElementById('promotion').innerText;
+
+            // 获取用户选择的购买意愿
+            var purchaseIntention = document.querySelector('input[name="intention"]:checked');
+
+            if (purchaseIntention) {
+                // 获取用户选择的意愿值
+                var choice = purchaseIntention.value;
+
+                // 将当前条件和用户选择记录下来
+                var record = {
+                    'Price': currentPrice,
+                    'Color': currentColor,
+                    'Promotion': currentPromotion,
+                    'Purchase Intention': choice
+                };
+
+                // 通过 localStorage 将记录保存
+                var records = JSON.parse(localStorage.getItem('surveyRecords')) || [];
+                records.push(record);
+                localStorage.setItem('surveyRecords', JSON.stringify(records));
+
+                // 展示记录结果
+                document.getElementById('result').innerText = "Your choice has been recorded: " + JSON.stringify(record, null, 2);
+            } else {
+                alert("Please select a purchase intention before submitting.");
+            }
+        }
+
+        // 页面加载时检查是否有记录数据，并展示
+        window.onload = function() {
+            var records = JSON.parse(localStorage.getItem('surveyRecords')) || [];
+            if (records.length > 0) {
+                document.getElementById('result').innerText = "Previous records: " + JSON.stringify(records, null, 2);
+            }
+        }
+    </script>
+</body>
+</html>
